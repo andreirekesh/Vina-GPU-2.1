@@ -162,7 +162,7 @@ void do_search(model& m, const boost::optional<model>& ref, const scoring_functi
 	conf c = m.get_initial_conf();
 	fl e = max_fl;
 	const vec authentic_v(1000, 1000, 1000);
-	//score_only = true;
+	score_only = true;
 	if (score_only) {
 		fl intramolecular_energy = m.eval_intramolecular(prec, authentic_v, c);
 		naive_non_cache nnc(&prec); // for out of grid issues
@@ -242,9 +242,9 @@ void do_search(model& m, const boost::optional<model>& ref, const scoring_functi
 		log.setf(std::ios::fixed, std::ios::floatfield);
 		log.setf(std::ios::showpoint);
 		log << '\n';
-		log << "mode |   affinity | dist from best mode\n";
-		log << "     | (kcal/mol) | rmsd l.b.| rmsd u.b.\n";
-		log << "-----+------------+----------+----------\n";
+		//log << "mode |   baffinity | dist from best mode\n";
+		//log << "     | (kcal/mol) | rmsd l.b.| rmsd u.b.\n";
+		//log << "-----+------------+----------+----------\n";
 
 		model best_mode_model = m;
 		if (!out_cont.empty())
@@ -253,10 +253,10 @@ void do_search(model& m, const boost::optional<model>& ref, const scoring_functi
 		sz how_many = 0;
 		std::vector<std::string> remarks;
 		VINA_FOR_IN(i, out_cont) {
-			if (how_many >= num_modes || !not_max(out_cont[i].e) || out_cont[i].e > out_cont[0].e + energy_range) break; // check energy_range sanity FIXME
+			if (how_many >= 1 || !not_max(out_cont[i].e) || out_cont[i].e > out_cont[0].e + energy_range) break; // check energy_range sanity FIXME
 			++how_many;
 			log << std::setw(4) << i + 1
-				<< "    " << std::setw(9) << std::setprecision(1) << out_cont[i].e; // intermolecular_energies[i];
+				<< "    " << std::setw(9) << std::setprecision(3) << out_cont[i].e; // intermolecular_energies[i];
 			m.set(out_cont[i].c);
 			const model& r = ref ? ref.get() : best_mode_model;
 			const fl lb = m.rmsd_lower_bound(r);
@@ -268,7 +268,7 @@ void do_search(model& m, const boost::optional<model>& ref, const scoring_functi
 			log.endl();
 		}
 		doing(verbosity, "Writing output", log);
-		write_all_output(m, out_cont, how_many, out_name, remarks);
+		//write_all_output(m, out_cont, how_many, out_name, remarks);
 		done(verbosity, log);
 
 		if (how_many < 1) {
@@ -356,6 +356,7 @@ void main_procedure(std::vector<model>& ms, const boost::optional<model>& ref, /
 	const scoring_function& sf = wt;
 	std::cout << std::endl;
 
+	std::vector<float> zeroes(ligand_names.size(), 0.0f);
 	for (int ligand_count = 0; ligand_count < ligand_num; ligand_count++) {
 
 		output_container out_cont = out_conts[ligand_count];
@@ -364,7 +365,7 @@ void main_procedure(std::vector<model>& ms, const boost::optional<model>& ref, /
 		std::string name_tmp = out_names[ligand_count];
 		//int int1 = name_tmp.find("\\"); int int2 = name_tmp.find(".pdbqt");
 		std::string name_tmp2 = name_tmp.substr(name_tmp.find("\\")+1, name_tmp.length() - name_tmp.find("\\") -11);
-		std::cout << "Refining ligand " << name_tmp2 << " results...";
+		//std::cout << "Refining ligand " << name_tmp2 << " results...";
 #ifndef NO_REFINEMENT
 		VINA_FOR_IN(i, out_cont)
 			refine_structure(m, prec, nc[ligand_count], out_cont[i], authentic_v, par.mc.ssd_par.bfgs_steps[ligand_count]);
@@ -391,9 +392,9 @@ void main_procedure(std::vector<model>& ms, const boost::optional<model>& ref, /
 		log.setf(std::ios::fixed, std::ios::floatfield);
 		log.setf(std::ios::showpoint);
 		/*log << '\n';*/
-		log << "mode |   affinity | dist from best mode\n";
-		log << "     | (kcal/mol) | rmsd l.b.| rmsd u.b.\n";
-		log << "-----+------------+----------+----------\n";
+		//log << "mode |   affinity | dist from best mode\n";
+		//log << "     | (kcal/mol) | rmsd l.b.| rmsd u.b.\n";
+		//log << "-----+------------+----------+----------\n";
 
 		model best_mode_model = m;
 		if (!out_cont.empty())
@@ -401,23 +402,33 @@ void main_procedure(std::vector<model>& ms, const boost::optional<model>& ref, /
 
 		sz how_many = 0;
 		std::vector<std::string> remarks;
+
 		VINA_FOR_IN(i, out_cont) {
-			if (how_many >= num_modes || !not_max(out_cont[i].e) || out_cont[i].e > out_cont[0].e + energy_range) break; // check energy_range sanity FIXME
+			if (how_many >= 1 || !not_max(out_cont[i].e) || out_cont[i].e > out_cont[0].e + energy_range) break; // check energy_range sanity FIXME
 			++how_many;
-			log << std::setw(4) << i + 1
-				<< "    " << std::setw(9) << std::setprecision(1) << out_cont[i].e; // intermolecular_energies[i];
+			size_t lastSlashIndex = name_tmp2.find_last_of('/');
+			std::string substring = name_tmp2.substr(lastSlashIndex + 1);
+			zeroes[std::stoi(substring)] = out_cont[i].e;
+			
 			m.set(out_cont[i].c);
 			const model& r = ref ? ref.get() : best_mode_model;
 			const fl lb = m.rmsd_lower_bound(r);
 			const fl ub = m.rmsd_upper_bound(r);
-			log << "  " << std::setw(9) << std::setprecision(3) << lb
-				<< "  " << std::setw(9) << std::setprecision(3) << ub; // FIXME need user-readable error messages in case of failures
+			//log << "  " << std::setw(9) << std::setprecision(3) << lb
+			//	<< "  " << std::setw(9) << std::setprecision(3) << ub; // FIXME need user-readable error messages in case of failures
 
 			remarks.push_back(vina_remark(out_cont[i].e, lb, ub));
-			log.endl();
+			//log.endl();
 		}
-		std::cout << "Writing ligand " << name_tmp2 << " output...";
-		write_all_output(m, out_cont, how_many, out_names[ligand_count], remarks);
+
+		std::string filename = "/workspace/Tyers/Mpro-GFN/Mpro-GFN/src/gflownet/tasks/temp_pdbqt/scores.txt";
+		std::ofstream file(filename, std::ios::out | std::ios::trunc);
+		for (int idx = 0; idx < zeroes.size(); idx++) {
+			file << zeroes[idx] << "\n"; // intermolecular_energies[i];
+		}
+		file.close();
+		//std::cout << "Writing ligand " << name_tmp2 << " output...";
+		//write_all_output(m, out_cont, how_many, out_names[ligand_count], remarks);
 		
 
 		if (how_many < 1) {
@@ -428,6 +439,7 @@ void main_procedure(std::vector<model>& ms, const boost::optional<model>& ref, /
 		done(verbosity, log);
 		std::cout << std::endl;
 	}
+	
 }
 
 struct usage_error : public std::runtime_error {
@@ -541,7 +553,7 @@ Thank you!\n";
 	try {
 		std::string rigid_name, ligand_name, flex_name, config_name, out_name, log_name;
 		fl center_x = -8.654, center_y = 2.229, center_z = 19.715, size_x = 24.0, size_y = 26.25, size_z = 22.5;
-		int cpu = 1, seed, exhaustiveness = 1, verbosity = 2, num_modes = 9;
+		int cpu = 1, seed, exhaustiveness = 1, verbosity = 1, num_modes = 9;
 		fl energy_range = 2.0;
 		int search_depth = 0;
 		int thread = 5000;
@@ -901,6 +913,6 @@ Thank you!\n";
 	}
 #endif
 
-	std::cout << "QuickVina 2-GPU3 total runtime = " << (double)(end - start) / CLOCKS_PER_SEC << " s" << std::endl;
+	//std::cout << "QuickVina 2-GPU3 total runtime = " << (double)(end - start) / CLOCKS_PER_SEC << " s" << std::endl;
 	//getchar();
 }
