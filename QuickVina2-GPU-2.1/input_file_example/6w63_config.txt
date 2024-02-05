@@ -1,0 +1,11 @@
+receptor = /workspace/Tyers/data/mpro/6w63_cleaned.pdbqt
+ligand_directory = /workspace/Tyers/Mpro-GFN/Mpro-GFN/src/gflownet/tasks/temp_pdbqt
+opencl_binary_path = /home/shidi/Vina-GPU-2.1/QuickVina2-GPU-2.1
+center_x = -20.458
+center_y = 18.109
+center_z = -26.914
+size_x = 25
+size_y = 25
+size_z = 25
+thread = 8000
+num_modes = 15
