@@ -23,9 +23,10 @@ Vina-GPU 2.1 includes AutoDock-Vina-GPU 2.1, QuickVina 2-GPU 2.1 and QuickVina-W
 8. **Additional Step - Andrei** type `mkdir -p /etc/OpenCL/vendors` and `echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd` to make a file that specifies which dynamic library to use for OpenCL. **This may not be necessary if you aren't doing this inside a docker container, you can check if the file already exists**
 9. after a successful compiling, `$(ONE_OF_VINA_GPU_2_1_METHODS)` can be seen in the directory 
 10. change `--opencl_binary_path` in the `./input_file_example/2bm2_config.txt` accordingly and type `$(ONE_OF_VINA_GPU_2_1_METHODS) --config ./input_file_example/2bm2_config.txt` to run one of the Vina-GPU 2.1 method
+
      **Note (Andrei)**: Also change `receptor` and `ligand_directory`. In the Reaction-GFN proxy class I have created, the config file is automatically created at runtime, so you can pass these in. If you want to try an example, though, you'll have to do this manually.
-11. once you successfully run `$(ONE_OF_VINA_GPU_2_1_METHODS)`, its runtime can be further reduced by typing `make clean` and `make` to build it without compiling kernel files (but make sure the `Kernel1_Opt.bin` file and `Kernel2_Opt.bin` file is located in the dir specified by `--opencl_binary_path`)
-12. other compile options: 
+12. once you successfully run `$(ONE_OF_VINA_GPU_2_1_METHODS)`, its runtime can be further reduced by typing `make clean` and `make` to build it without compiling kernel files (but make sure the `Kernel1_Opt.bin` file and `Kernel2_Opt.bin` file is located in the dir specified by `--opencl_binary_path`)
+13. other compile options: 
 
 |Options| Description|
 |--|--|
