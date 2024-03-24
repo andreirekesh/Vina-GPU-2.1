@@ -3,7 +3,7 @@ Vina-GPU 2.1 further improves the virtual screening runtime and accuracy with th
 Vina-GPU 2.1 includes AutoDock-Vina-GPU 2.1, QuickVina 2-GPU 2.1 and QuickVina-W-GPU 2.1.
 ![Vina-GPU2 1-arch](https://github.com/DeltaGroupNJUPT/Vina-GPU-2.1/assets/48940269/3b42ed59-01ce-449a-b203-deea1f0d0a36)
 
-**Note - Andrei: I've included a Dockerfile that installs boost 1.77, clones and compiles this code, and makes the necessary files. You can copy some of the commands if you'd like. Remember to change the paths in Makefile and your config.txt in `./input_file_example` if you want to try running a manual example.**
+**Note - Andrei: I've included a Dockerfile that installs boost 1.77, clones and compiles this code, and makes the necessary files. As you'll see, there are three different algorithms. THE ONLY USABLE ONE IS QUICKVINA2. You can copy some of the commands if you'd like. Remember to change the paths in Makefile and your config.txt in `./input_file_example` if you want to try running a manual example. Change opencl_binary_path to the current quickvina2 directory, i.e /home/michal/Vina-GPU-2.1/QuickVina2-GPU-2.1, it is looking for the two .opt files in that directory.**
 
 ### Linux
 **Note**: At least 8M stack size is needed. To change the stack size, use `ulimit -s 8192`.
