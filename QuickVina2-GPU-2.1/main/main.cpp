@@ -285,7 +285,7 @@ void main_procedure(std::vector<model>& ms, const boost::optional<model>& ref, /
 	const grid_dims& gd, int exhaustiveness,
 	const flv& weights,
 	int cpu, int seed, int verbosity, sz num_modes, fl energy_range, 
-	tee& log, int search_depth, int thread, std::string opencl_binary_path, std::vector<std::vector<std::string>> ligand_names, int rilc_bfgs) {
+	tee& log, int search_depth, int thread, std::string opencl_binary_path, std::vector<std::vector<std::string>> ligand_names, std::string ligand_directory, int rilc_bfgs) {
 
 	doing(verbosity, "Setting up the scoring function", log);
 
@@ -356,7 +356,7 @@ void main_procedure(std::vector<model>& ms, const boost::optional<model>& ref, /
 	const scoring_function& sf = wt;
 	std::cout << std::endl;
 
-	std::vector<float> zeroes(ligand_names.size(), 0.0f);
+	std::vector<float> zeroes(ligand_names.size()-1, 0.0f);
 	for (int ligand_count = 0; ligand_count < ligand_num; ligand_count++) {
 
 		output_container out_cont = out_conts[ligand_count];
@@ -421,7 +421,7 @@ void main_procedure(std::vector<model>& ms, const boost::optional<model>& ref, /
 			//log.endl();
 		}
 
-		std::string filename = "/workspace/Tyers/Mpro-GFN/Mpro-GFN/src/gflownet/tasks/temp_pdbqt/scores.txt";
+		path filename = make_path(ligand_directory) / make_path("scores.txt");
 		std::ofstream file(filename, std::ios::out | std::ios::trunc);
 		for (int idx = 0; idx < zeroes.size(); idx++) {
 			file << zeroes[idx] << "\n"; // intermolecular_energies[i];
@@ -553,7 +553,7 @@ Thank you!\n";
 	try {
 		std::string rigid_name, ligand_name, flex_name, config_name, out_name, log_name;
 		fl center_x = -8.654, center_y = 2.229, center_z = 19.715, size_x = 24.0, size_y = 26.25, size_z = 22.5;
-		int cpu = 1, seed, exhaustiveness = 1, verbosity = 1, num_modes = 9;
+		int cpu = 1, seed, exhaustiveness = 128, verbosity = 1, num_modes = 9;
 		fl energy_range = 2.0;
 		int search_depth = 0;
 		int thread = 5000;
@@ -617,7 +617,7 @@ Thank you!\n";
 		misc.add_options()
 			//("cpu", value<int>(&cpu), "the number of CPUs to use (the default is to try to detect the number of CPUs or, failing that, use 1)")
 			("seed", value<int>(&seed), "explicit random seed")
-			//("exhaustiveness", value<int>(&exhaustiveness)->default_value(1), "exhaustiveness of the global search (roughly proportional to time): 1+")
+			("exhaustiveness", value<int>(&exhaustiveness)->default_value(1), "exhaustiveness of the global search (roughly proportional to time): 1+")
 			("num_modes", value<int>(&num_modes)->default_value(9), "maximum number of binding modes to generate")
 			("energy_range", value<fl>(&energy_range)->default_value(3.0), "maximum energy difference between the best binding mode and the worst one displayed (kcal/mol)")
 			;
@@ -818,7 +818,7 @@ Thank you!\n";
 			else
 				out_dir = ligand_directory + "_out";
 
-			std::experimental::filesystem::create_directory(out_dir);
+			//std::experimental::filesystem::create_directory(out_dir);
 			for (const auto& entry : std::experimental::filesystem::directory_iterator(ligand_directory)) {
 				std::vector<std::string> tmp = { entry.path().string() };
 				ligand_names.push_back(tmp);
@@ -864,7 +864,7 @@ Thank you!\n";
 			score_only, local_only, randomize_only, false, // no_cache == false
 			gd, exhaustiveness,
 			weights,
-			cpu, seed, verbosity, max_modes_sz, energy_range, log, search_depth, thread, opencl_binary_path, ligand_names, rilc_bfgs);
+			cpu, seed, verbosity, max_modes_sz, energy_range, log, search_depth, thread, opencl_binary_path, ligand_names, ligand_directory, rilc_bfgs);
 	}
 	catch (file_error& e) {
 		std::cerr << "\n\nError: could not open \"" << e.name.string() << "\" for " << (e.in ? "reading" : "writing") << ".\n";
