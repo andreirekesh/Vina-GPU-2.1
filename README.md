@@ -3,34 +3,6 @@ Vina-GPU 2.1 further improves the virtual screening runtime and accuracy with th
 Vina-GPU 2.1 includes AutoDock-Vina-GPU 2.1, QuickVina 2-GPU 2.1 and QuickVina-W-GPU 2.1.
 ![Vina-GPU2 1-arch](https://github.com/DeltaGroupNJUPT/Vina-GPU-2.1/assets/48940269/3b42ed59-01ce-449a-b203-deea1f0d0a36)
 
-
-
-## Virtual Screening Results
-
-* Runtime comparison of Vina-GPU 2.1 on Drugbank library (partial)
-![runtime_all_drugbank](https://github.com/DeltaGroupNJUPT/Vina-GPU-2.1/assets/48940269/d728fee5-d4a6-4a16-bbde-cec06a81e38d)
-
-* Accuracy comparison of Vina-GPU 2.1 on Drugbank library (partial)
-![vs_accuracy_all_drugbank](https://github.com/DeltaGroupNJUPT/Vina-GPU-2.1/assets/48940269/eacffd1d-cb2a-40d9-9a74-4e8d071aac7b)
-
-## Compiling and Running
-### Windows
-#### Build from source file
->Visual Studio 2019 is recommended for build Vina-GPU 2.1 from source
-1. install [boost library](https://www.boost.org/) (current version is 1.77.0)
-2. install [CUDA Toolkit](https://developer.nvidia.com/cuda-downloads) (current version: v12.2) if you are using NVIDIA GPU cards
-
-    **Note**: the OpenCL library can be found in CUDA installation path for NVIDIA or in the driver installation path for AMD
-
-3. add `$(ONE_OF_VINA_GPU_2_1_METHODS)/lib` `$(ONE_OF_VINA_GPU_2_1_METHODS)/OpenCL/inc` `$(YOUR_BOOST_LIBRARY_PATH)` `$(YOUR_BOOST_LIBRARY_PATH)/boost` `$(YOUR_CUDA_TOOLKIT_LIBRARY_PATH)/CUDA/v12.2/include` in the include directories
-4. add `$(YOUR_BOOST_LIBRARY_PATH)/stage/lib` `$(YOUR_CUDA_TOOLKIT_PATH)/CUDA/lib/x64`in the addtional library 
-5. add `OpenCL.lib` in the additional dependencies 
-6. add `--config=$(ONE_OF_VINA_GPU_2_1_METHODS)/input_file_example/2bm2_config.txt` in the command arguments
-7.  add `NVIDIA_PLATFORM` `OPENCL_3_0` `WINDOWS` in the preprocessor definitions if necessary
-8. if you want to compile the binary kernel file on the fly, add `BUILD_KERNEL_FROM_SOURCE` in the preprocessor definitions
-9. build & run
-**Note**: ensure the line ending are CLRF
-
 ### Linux
 **Note**: At least 8M stack size is needed. To change the stack size, use `ulimit -s 8192`.
 1. install [boost library](https://www.boost.org/) (current version is 1.77.0)
@@ -39,7 +11,7 @@ Vina-GPU 2.1 includes AutoDock-Vina-GPU 2.1, QuickVina 2-GPU 2.1 and QuickVina-W
     **Note**: OpenCL library can be usually in `/usr/local/cuda` (for NVIDIA GPU cards)
 3. `cd` into one of the three methods of Vina-GPU 2.1 (`$(ONE_OF_VINA_GPU_2_1_METHODS)`)
 4. change the `BOOST_LIB_PATH` and `OPENCL_LIB_PATH` accordingly in `Makefile`
-5. set GPU platform `GPU_PLATFORM` and OpenCL version `OPENCL_VERSION` in `Makefile`. some options are given below:
+6. set GPU platform `GPU_PLATFORM` and OpenCL version `OPENCL_VERSION` in `Makefile`. some options are given below:
 
     **Note**: `-DOPENCL_3_0` is highly recommended in Linux, please avoid using `-OPENCL_1_2` in the Makefile setting. To check the OpenCL version on a given platform, use `clinfo`.
     |Macros|Options|Descriptions|
@@ -47,11 +19,13 @@ Vina-GPU 2.1 includes AutoDock-Vina-GPU 2.1, QuickVina 2-GPU 2.1 and QuickVina-W
     |GPU_PLATFORM|-DNVIDIA_PLATFORM / -DAMD_PLATFORM|NVIDIA / AMD GPU platform
     |  OPENCL_VERSION | -DOPENCL_3_0 / -OPENCL_2_0|OpenCL version 2.1 / 2.0
     
-6. type `make clean` and `make source` to build `$(ONE_OF_VINA_GPU_2_1_METHODS)` that compile the kernel files on the fly (this would take some time at the first use)
-7. after a successful compiling, `$(ONE_OF_VINA_GPU_2_1_METHODS)` can be seen in the directory 
-8. change `--opencl_binary_path` in the `./input_file_example/2bm2_config.txt` accordingly and type `$(ONE_OF_VINA_GPU_2_1_METHODS) --config ./input_file_example/2bm2_config.txt` to run one of the Vina-GPU 2.1 method
-9. once you successfully run `$(ONE_OF_VINA_GPU_2_1_METHODS)`, its runtime can be further reduced by typing `make clean` and `make` to build it without compiling kernel files (but make sure the `Kernel1_Opt.bin` file and `Kernel2_Opt.bin` file is located in the dir specified by `--opencl_binary_path`)
-10. other compile options: 
+7. type `make clean` and `make source` to build `$(ONE_OF_VINA_GPU_2_1_METHODS)` that compile the kernel files on the fly (this would take some time at the first use)
+8. **Additional Step - Andrei** type `mkdir -p /etc/OpenCL/vendors` and `echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd` to make a file that specifies which dynamic library to use for OpenCL. **This may not be necessary if you aren't doing this inside a docker container, you can check if the file already exists**
+9. after a successful compiling, `$(ONE_OF_VINA_GPU_2_1_METHODS)` can be seen in the directory 
+10. change `--opencl_binary_path` in the `./input_file_example/2bm2_config.txt` accordingly and type `$(ONE_OF_VINA_GPU_2_1_METHODS) --config ./input_file_example/2bm2_config.txt` to run one of the Vina-GPU 2.1 method
+     **Note (Andrei)**: Also change `receptor` and `ligand_directory`. In the Reaction-GFN proxy class I have created, the config file is automatically created at runtime, so you can pass these in. If you want to try an example, though, you'll have to do this manually.
+11. once you successfully run `$(ONE_OF_VINA_GPU_2_1_METHODS)`, its runtime can be further reduced by typing `make clean` and `make` to build it without compiling kernel files (but make sure the `Kernel1_Opt.bin` file and `Kernel2_Opt.bin` file is located in the dir specified by `--opencl_binary_path`)
+12. other compile options: 
 
 |Options| Description|
 |--|--|
