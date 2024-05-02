@@ -328,7 +328,6 @@ void main_procedure(std::vector<model>& ms, const boost::optional<model>& ref, /
 	for (int ligand_count = 0; ligand_count < ligand_num; ligand_count++) {
 		par.mc.ssd_par.bfgs_steps.push_back(unsigned((25 + ms[ligand_count].num_movable_atoms()) / 3));
 	}
-
 	par.mc.min_rmsd = 1.0;
 	par.mc.num_saved_mins = 20;
 	par.mc.hunt_cap = vec(10, 10, 10);
@@ -428,7 +427,7 @@ void main_procedure(std::vector<model>& ms, const boost::optional<model>& ref, /
 		}
 		file.close();
 		//std::cout << "Writing ligand " << name_tmp2 << " output...";
-		//write_all_output(m, out_cont, how_many, out_names[ligand_count], remarks);
+		write_all_output(m, out_cont, how_many, out_names[ligand_count], remarks);
 		
 
 		if (how_many < 1) {
@@ -816,7 +815,7 @@ Thank you!\n";
 			if (vm.count("output_directory") == 1)
 				out_dir = output_directory;
 			else
-				out_dir = ligand_directory + "_out";
+				out_dir = ligand_directory;
 
 			//std::experimental::filesystem::create_directory(out_dir);
 			for (const auto& entry : std::experimental::filesystem::directory_iterator(ligand_directory)) {
