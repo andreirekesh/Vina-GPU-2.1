@@ -22,7 +22,7 @@ RUN ./b2 install
 
 WORKDIR /workspace
 RUN git clone https://github.com/DeltaGroupNJUPT/Vina-GPU-2.1.git
-ADD QuickVina2-GPU-2.1/Makefile /workspace/Vina-GPU-2.1/QuickVina2-GPU-2.1/
+# ADD QuickVina2-GPU-2.1/Makefile /workspace/Vina-GPU-2.1/QuickVina2-GPU-2.1/
 
 WORKDIR /workspace/Vina-GPU-2.1/QuickVina2-GPU-2.1
 RUN make clean 
