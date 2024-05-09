@@ -355,7 +355,7 @@ void main_procedure(std::vector<model>& ms, const boost::optional<model>& ref, /
 	const scoring_function& sf = wt;
 	std::cout << std::endl;
 
-	std::vector<float> zeroes(ligand_names.size()-1, 0.0f);
+	std::vector<float> zeroes(ligand_names.size(), 0.0f);
 	for (int ligand_count = 0; ligand_count < ligand_num; ligand_count++) {
 
 		output_container out_cont = out_conts[ligand_count];
@@ -616,7 +616,7 @@ Thank you!\n";
 		misc.add_options()
 			//("cpu", value<int>(&cpu), "the number of CPUs to use (the default is to try to detect the number of CPUs or, failing that, use 1)")
 			("seed", value<int>(&seed), "explicit random seed")
-			("exhaustiveness", value<int>(&exhaustiveness)->default_value(1), "exhaustiveness of the global search (roughly proportional to time): 1+")
+			("exhaustiveness", value<int>(&exhaustiveness)->default_value(128), "exhaustiveness of the global search (roughly proportional to time): 1+")
 			("num_modes", value<int>(&num_modes)->default_value(9), "maximum number of binding modes to generate")
 			("energy_range", value<fl>(&energy_range)->default_value(3.0), "maximum energy difference between the best binding mode and the worst one displayed (kcal/mol)")
 			;
